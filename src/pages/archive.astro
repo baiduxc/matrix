@@ -1,0 +1,6 @@
+---
+import Layout from "../layouts/MatrixLayout.astro";
+import { getMatrixPosts, postMeta } from "../lib/matrix-content";
+const posts = (await getMatrixPosts()).map(postMeta);
+---
+<Layout title="文章列表"><h1>文章列表 · {posts.length}</h1>{posts.slice(0, 10).map(post => <article><a href={post.url}><h2>{post.title}</h2></a><time>{post.date}</time><p>{post.description}</p></article>)}<nav aria-label="文章分页">{Array.from({length:Math.ceil(posts.length / 10)}, (_,index) => <a href={`/archive/?page=${index + 1}`}>第 {index + 1} 页</a>)}</nav></Layout>

@@ -1,0 +1,7 @@
+---
+import Layout from "../layouts/MatrixLayout.astro";
+import { siteMeta } from "../matrix/config/site.js";
+import { getMatrixPosts, postMeta } from "../lib/matrix-content";
+const posts = (await getMatrixPosts()).map(postMeta);
+---
+<Layout><h1>{siteMeta.heroTitle}。</h1><p>{siteMeta.heroSubtitle}</p><section>{posts.slice(0,24).map(post => <article><a href={post.url}><h2>{post.title}</h2></a><p>{post.description}</p></article>)}</section><a href="/archive/">全部 {posts.length} 篇文章</a></Layout>

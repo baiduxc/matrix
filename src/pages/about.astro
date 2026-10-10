@@ -1,0 +1,5 @@
+---
+import Layout from "../layouts/MatrixLayout.astro";
+import { siteMeta } from "../matrix/config/site.js";
+---
+<Layout title="关于我"><h1>我是{siteMeta.owner}。</h1><p>{siteMeta.about.lead}</p><p>{siteMeta.about.description}</p></Layout>

@@ -1,0 +1,70 @@
+{
+	"name": "astro-theme-matrix",
+	"type": "module",
+	"version": "1.0.0",
+	"scripts": {
+		"dev": "astro dev",
+		"start": "astro dev",
+		"check": "astro check",
+		"build": "astro build --force",
+		"preview": "astro preview",
+		"astro": "astro",
+		"type-check": "astro check",
+		"new-post": "node scripts/new-post.js",
+		"format": "biome format --write ./src",
+		"lint": "biome check --write ./src",
+		"test": "node --test tests/*.test.mjs"
+	},
+	"dependencies": {
+		"@astrojs/check": "^0.9.4",
+		"@astrojs/react": "4.4.2",
+		"@astrojs/rss": "^4.0.12",
+		"@astrojs/sitemap": "^3.5.0",
+		"@phosphor-icons/react": "2.1.10",
+		"astro": "5.13.5",
+		"dompurify": "3.3.0",
+		"hast-util-from-html": "2.0.3",
+		"hastscript": "^9.0.1",
+		"highlight.js": "11.12.0",
+		"katex": "^0.16.22",
+		"markdown-it": "^14.1.0",
+		"marked": "15.0.12",
+		"mdast-util-to-string": "^4.0.0",
+		"mermaid": "11.12.0",
+		"node-html-parser": "^7.0.1",
+		"react": "19.2.0",
+		"react-dom": "19.2.0",
+		"reading-time": "^1.5.0",
+		"rehype-autolink-headings": "^7.1.0",
+		"rehype-components": "^0.3.0",
+		"rehype-katex": "^7.0.1",
+		"rehype-slug": "^6.0.0",
+		"remark-directive": "^3.0.1",
+		"remark-github-admonitions-to-directives": "^1.0.5",
+		"remark-math": "^6.0.0",
+		"remark-sectionize": "^2.1.0",
+		"sanitize-html": "^2.17.0",
+		"sharp": "^0.34.3",
+		"three": "0.180.0",
+		"typescript": "^5.9.2",
+		"unist-util-visit": "^5.0.0"
+	},
+	"devDependencies": {
+		"@astrojs/ts-plugin": "^1.10.4",
+		"@biomejs/biome": "2.2.2",
+		"@types/hast": "^3.0.4",
+		"@types/markdown-it": "^14.1.2",
+		"@types/mdast": "^4.0.4",
+		"@types/sanitize-html": "^2.16.0"
+	},
+	"packageManager": "pnpm@9.14.4",
+	"engines": {
+		"node": ">=22.11.0"
+	},
+	"license": "MIT",
+	"description": "An immersive Matrix-inspired Astro blog theme.",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/baiduxc/matrix.git"
+	}
+}

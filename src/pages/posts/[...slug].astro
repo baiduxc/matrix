@@ -1,0 +1,14 @@
+---
+import Layout from "../../layouts/MatrixLayout.astro";
+import { ArticleCredit } from "../../matrix/ArticleCredit.jsx";
+import { postMeta, getMatrixPosts } from "../../lib/matrix-content";
+export async function getStaticPaths() {
+	return (await getMatrixPosts()).map((post) => ({
+		params: { slug: post.slug },
+		props: { post },
+	}));
+}
+const { post } = Astro.props;
+const { Content } = await post.render();
+---
+<Layout title={post.data.title} description={post.data.description || post.data.title} post={post}><article data-pagefind-body><h1 data-pagefind-meta="title">{post.data.title}</h1><time datetime={post.data.published.toISOString()}>{post.data.published.toISOString().slice(0,10)}</time><div class="markdown"><Content/></div><ArticleCredit post={postMeta(post)}/></article></Layout>
