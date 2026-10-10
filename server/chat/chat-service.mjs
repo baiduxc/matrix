@@ -1,11 +1,8 @@
 import { readEventStream } from "../../src/matrix/lib/event-stream.js";
 import { ChatError } from "./chat-errors.mjs";
-export const chatDefaults = {
-	model: "deepseek-v4.1-flash",
-	baseUrl: "https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
-};
+import { resolveChatConfig } from "./providers.mjs";
 const system =
-	"你是 技术博客的矩阵助手，擅长 AI、技术开发和系统设计。默认用简洁清晰的中文回答，代码使用带语言标记的 Markdown 代码块。承认不确定性，不假装访问实时信息、执行代码或了解未提供的博客文章。";
+	"你是技术博客的矩阵助手，擅长 AI、技术开发和系统设计。默认用简洁清晰的中文回答，代码使用带语言标记的 Markdown 代码块。承认不确定性，不假装访问实时信息、执行代码或了解未提供的博客文章。";
 export function validateInput(input) {
 	if (
 		!input ||
@@ -49,24 +46,13 @@ export function safeError(error, signal) {
 }
 export async function openChat(env, input, signal, fetchImpl = fetch) {
 	const { message, history } = validateInput(input);
-	const apiKey = env.BAILIAN_API_KEY?.trim();
-	if (!apiKey)
+	const config = resolveChatConfig(env);
+	if (!config.configured)
 		throw new ChatError(
 			503,
 			"CHAT_NOT_CONFIGURED",
-			"助手暂未连接，请配置 Token Plan API Key",
+			"助手暂未连接，请配置 API Key、模型和接口地址",
 		);
-	const base = new URL(env.BAILIAN_CHAT_BASE_URL || chatDefaults.baseUrl);
-	if (
-		base.protocol !== "https:" ||
-		base.hostname !== "token-plan.cn-beijing.maas.aliyuncs.com" ||
-		base.username ||
-		base.password ||
-		base.search ||
-		base.hash ||
-		base.pathname.replace(/\/$/, "") !== "/compatible-mode/v1"
-	)
-		throw new ChatError(503, "CHAT_CONFIG", "助手接口配置有误");
 	const controller = new AbortController();
 	const abort = () => controller.abort();
 	signal?.addEventListener("abort", abort, { once: true });
@@ -80,30 +66,27 @@ export async function openChat(env, input, signal, fetchImpl = fetch) {
 	try {
 		if (signal?.aborted)
 			throw new ChatError(499, "CHAT_CANCELLED", "对话已停止");
-		upstream = await fetchImpl(
-			`${base.href.replace(/\/$/, "")}/chat/completions`,
-			{
-				method: "POST",
-				redirect: "error",
-				signal: controller.signal,
-				headers: {
-					Authorization: `Bearer ${apiKey}`,
-					"Content-Type": "application/json",
-					Accept: "text/event-stream",
-				},
-				body: JSON.stringify({
-					model: env.BAILIAN_CHAT_MODEL || chatDefaults.model,
-					messages: [
-						{ role: "system", content: system },
-						...history,
-						{ role: "user", content: message },
-					],
-					stream: true,
-					enable_thinking: false,
-					max_tokens: 1500,
-				}),
+		upstream = await fetchImpl(config.endpoint, {
+			method: "POST",
+			redirect: "error",
+			signal: controller.signal,
+			headers: {
+				Authorization: `Bearer ${config.apiKey}`,
+				"Content-Type": "application/json",
+				Accept: "text/event-stream",
 			},
-		);
+			body: JSON.stringify({
+				model: config.model,
+				messages: [
+					{ role: "system", content: system },
+					...history,
+					{ role: "user", content: message },
+				],
+				stream: true,
+				...config.extraBody,
+				[config.tokenParameter]: config.maxTokens,
+			}),
+		});
 		if (
 			!upstream.ok ||
 			!upstream.body ||
@@ -114,7 +97,7 @@ export async function openChat(env, input, signal, fetchImpl = fetch) {
 				throw new ChatError(
 					502,
 					"CHAT_AUTH",
-					"API Key 无效或已失效，请检查 Token Plan 配置",
+					"API Key 无效或已失效，请检查服务商配置",
 				);
 			if (upstream.status === 403)
 				throw new ChatError(

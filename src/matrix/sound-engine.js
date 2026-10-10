@@ -1,7 +1,23 @@
+import { siteMeta } from "./config/site.js";
 import { audioConfig } from "./config/audio.js";
 
 // One lazily unlocked context serves the bell, keyboard tick and cover-entry laser.
 export function createSoundEngine() {
+	if (!siteMeta.soundEnabled) {
+		let disposed = false;
+		return {
+			setVisible() {},
+			async play() {},
+			isDisposed: () => disposed,
+			getDiagnostics: () => ({
+				state: disposed ? "closed" : "disabled",
+				sources: 0,
+			}),
+			dispose() {
+				disposed = true;
+			},
+		};
+	}
 	const Context = window.AudioContext || window.webkitAudioContext;
 	if (!Context) throw new Error("Web Audio is unavailable");
 	const context = new Context({ latencyHint: "interactive" });

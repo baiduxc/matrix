@@ -7,6 +7,7 @@ export const siteMeta = {
 	description: "AI、技术开发与创造。欢迎来到我的数字世界。",
 	brand: "MATRIX",
 	tagline: "AI × ENGINEERING",
+	soundEnabled: true, // Set false to disable click, typing and beam sounds.
 	heroTitle: "欢迎来到我的数字世界",
 	heroSubtitle: "AI 前沿 / 系统拆解 / 开发实践",
 	github: "https://github.com/your-username",

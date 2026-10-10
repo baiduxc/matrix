@@ -693,6 +693,7 @@ export default function App({ posts, initialArticle = null }) {
 		};
 	}, [mode, modal, pageRail]);
 	const playSound = useCallback((kind) => {
+		if (!siteMeta.soundEnabled) return;
 		try {
 			if (!audioRef.current || audioRef.current.isDisposed())
 				audioRef.current = createSoundEngine();

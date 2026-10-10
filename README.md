@@ -8,7 +8,9 @@
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fbaiduxc%2Fmatrix&project-name=matrix-blog&repository-name=matrix-blog)
 [![使用 EdgeOne Pages 部署](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?repository-url=https%3A%2F%2Fgithub.com%2Fbaiduxc%2Fmatrix&project-name=matrix-blog&build-command=pnpm%20build&install-command=pnpm%20install%20--frozen-lockfile&output-directory=dist)
 
-**[Cloudflare Pages 部署说明 ↓](#cloudflare-pages)** · [在线主题实例](https://www.oferry.com/) · [问题反馈](https://github.com/baiduxc/matrix/issues)
+[演示地址](https://www.oferry.com/)
+
+**[Cloudflare Pages 部署说明 ↓](#cloudflare-pages)** · [问题反馈](https://github.com/baiduxc/matrix/issues)
 
 > 仓库不包含作者的文章、相册、备案号或 API Key。首次运行显示空文章状态；按下面的步骤发布自己的第一篇文章即可。在线实例包含作者的个人内容，不随主题分发。
 
@@ -58,6 +60,7 @@ pnpm preview # 预览静态产物；不启动聊天后端
 | --- | --- |
 | `title` / `owner` | 站点标题、作者与版权署名 |
 | `brand` / `tagline` | 导航 Logo、启动画面文字与副标题 |
+| `soundEnabled` | 音效总开关；`true` 开启，`false` 关闭点击、打字与镭射声音 |
 | `url` | 正式域名，例如 `https://blog.example.com`；用于 Canonical、RSS、Sitemap、文章地址 |
 | `description` | SEO 简介 |
 | `heroTitle` / `heroSubtitle` | 首页主标题与介绍 |
@@ -86,7 +89,7 @@ pnpm preview # 预览静态产物；不启动聊天后端
 更深入的视觉调整：
 
 - `src/matrix/config/characters.js`：人物帧与视线锚点。
-- `src/matrix/config/audio.js`：点击、打字、镭射音效参数。
+- `src/matrix/config/audio.js`：点击、打字、镭射音效的音量、频率和时长；总开关在 `site.js` 的 `soundEnabled`。
 - `src/matrix/config/syntax-highlighting.js`：代码语言别名和高亮颜色映射。
 - `src/matrix/styles.css`：布局与样式。
 - `public/assets/matrix/`：透明人物 WebP、地图和机械城背景。
@@ -137,7 +140,7 @@ pinned: false
 
 点击上方部署按钮，或在 [EdgeOne Pages](https://edgeone.ai/products/pages) 创建项目并导入自己的 GitHub / Gitee 仓库。根目录使用仓库根目录，配置由 `edgeone.json` 提供。确认输出目录为 `dist`，部署成功后绑定自己的域名。
 
-如启用聊天，在项目环境变量中添加 `BAILIAN_API_KEY`，选择需要生效的生产 / 预览环境，**保存后重新部署**。这里需要的是函数运行时可读取的环境变量。后续推送到关联分支会自动构建部署。
+如启用聊天，在项目环境变量中添加 `CHAT_API_KEY`、`CHAT_PROVIDER`、`CHAT_MODEL` 等聊天配置，选择需要生效的生产 / 预览环境，**保存后重新部署**。这里需要的是函数运行时可读取的环境变量。后续推送到关联分支会自动构建部署。
 
 [官方部署按钮说明](https://edgeone.ai/document/173005746529800192)
 
@@ -146,7 +149,7 @@ pinned: false
 1. Fork 本仓库。进入 Cloudflare 控制台的 **Workers & Pages**，创建 **Pages** 项目并连接 GitHub 仓库。
 2. 框架选择 Astro，生产分支选择 `main`，构建命令 `pnpm build`，构建输出目录 `dist`，根目录留空。
 3. 构建环境设置 `NODE_VERSION=22.11.0`、`PNPM_VERSION=9.14.4`，保存并部署。仓库同时提供 `.node-version` 和 Pages 用的 `wrangler.toml`。
-4. 需要聊天时，在项目 Settings 的 Variables and Secrets 中添加 `BAILIAN_API_KEY` **Secret**，分别配置生产 / 预览环境，然后重新部署。
+4. 需要聊天时，在项目 Settings 的 Variables and Secrets 中添加 `CHAT_API_KEY` **Secret**，以及 `CHAT_PROVIDER`、`CHAT_MODEL` 等聊天变量，分别配置生产 / 预览环境，然后重新部署。
 5. 在 Custom domains 中绑定自己的域名，并更新 `site.js` 中的 `url`。
 
 Pages 会自动编译仓库根目录下的 `functions/`。`public/_routes.json` 将函数调用范围限制为 `/api/*`，文章与静态资源继续由 CDN 提供。使用 Git 集成部署，避免仅上传 `dist` 而漏掉函数源码。
@@ -157,7 +160,7 @@ Pages 会自动编译仓库根目录下的 `functions/`。`public/_routes.json` 
 
 点击上方 **Deploy with Vercel**，或在 [Vercel](https://vercel.com/new) 导入自己的仓库。框架选择 Astro；`vercel.json` 已配置构建、输出和聊天函数时长。项目 Node.js 版本选择 **22.x**。
 
-如启用聊天，在项目 Settings → Environment Variables 添加 `BAILIAN_API_KEY`，选择 Production / Preview 环境，然后重新部署。无需 `PUBLIC_` 前缀。`api/` 中的函数使用 Node.js Web 标准入口并返回 SSE 流。
+如启用聊天，在项目 Settings → Environment Variables 添加 `CHAT_API_KEY`、`CHAT_PROVIDER`、`CHAT_MODEL` 等聊天配置，选择 Production / Preview 环境，然后重新部署。无需 `PUBLIC_` 前缀。`api/` 中的函数使用 Node.js Web 标准入口并返回 SSE 流。
 
 [官方部署按钮说明](https://vercel.com/docs/deploy-button) · [函数运行时说明](https://vercel.com/docs/functions/runtimes/node-js)
 
@@ -175,19 +178,49 @@ Pages 会自动编译仓库根目录下的 `functions/`。`public/_routes.json` 
 cp .env.example .env.local
 ```
 
-在 `.env.local` 填写：
+在 `.env.local` 选择服务商并填写该账号可用的模型：
 
 ```dotenv
-BAILIAN_API_KEY=你的阿里百炼TokenPlan密钥
-BAILIAN_CHAT_MODEL=deepseek-v4.1-flash
-BAILIAN_CHAT_BASE_URL=https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1
+CHAT_PROVIDER=bailian
+CHAT_API_KEY=你的服务商密钥
+CHAT_MODEL=你的模型ID
+# 自定义网关或其他地域地址时填写；使用预设地址则留空。
+CHAT_BASE_URL=
 ```
 
-重启 `pnpm dev`。生产部署则在平台控制台配置同名的**服务端环境变量 / Secret**，不上传 `.env.local`。当前接口限定为阿里百炼 Token Plan 北京地址；其他产品的 Key / 地址不能直接混用。默认模型为 `deepseek-v4.1-flash`，可改为自己账号可用的 Token Plan 文本模型。
+重启 `pnpm dev`。生产部署在平台控制台配置同名的**服务端环境变量 / Secret**，保存后重新部署。不要上传 `.env.local`。
+
+| `CHAT_PROVIDER` | 服务商 | 内置 Base URL | 模型设置 |
+| --- | --- | --- | --- |
+| `bailian` | 阿里云百炼标准模型 API（北京） | `https://dashscope.aliyuncs.com/compatible-mode/v1` | `CHAT_MODEL` 填账号已开通的模型 ID |
+| `volcengine` | 火山方舟 | `https://ark.cn-beijing.volces.com/api/v3` | 填模型 ID 或推理接入点 ID |
+| `deepseek` | DeepSeek 官方 | `https://api.deepseek.com` | 默认 `deepseek-flash`，可用 `CHAT_MODEL` 覆盖 |
+| `openai` | OpenAI 官方 | `https://api.openai.com/v1` | 填支持 Chat Completions 的模型 ID |
+| `gemini` | Google Gemini 的 OpenAI 兼容接口 | `https://generativelanguage.googleapis.com/v1beta/openai` | 填兼容接口支持的 Gemini 模型 ID |
+| `custom` | 自定义 OpenAI 兼容网关 | 必填 `CHAT_BASE_URL` | 必填 `CHAT_MODEL` |
+
+模型权限和地域取决于服务商账号。除 DeepSeek 的默认模型外，各预设需显式填写 `CHAT_MODEL`。密钥、模型或地址不完整时，聊天保持未连接状态；博客页面可正常使用。
+
+`CHAT_BASE_URL` 可以覆盖任意预设地址，支持 Base URL 或完整的 `/chat/completions` 地址，不会重复拼接后缀。地址须为 HTTPS，不能包含用户名、密码、查询参数或片段。接口需支持 OpenAI Chat Completions 格式及 SSE 流；OpenAI Responses API、Gemini 原生 `generateContent` 地址不适用于这里。
+
+自定义网关示例：
+
+```dotenv
+CHAT_PROVIDER=custom
+CHAT_API_KEY=你的网关密钥
+CHAT_MODEL=你的网关模型ID
+CHAT_BASE_URL=https://gateway.example.com/v1
+```
+
+可选高级参数：`CHAT_MAX_TOKENS` 为输出 token 预算，默认 `1500`，范围 `128–8192`；`CHAT_TOKEN_PARAMETER` 可选 `max_tokens` 或 `max_completion_tokens`。OpenAI 预设默认使用后者，其余预设默认使用前者；如果自定义网关要求另一种参数，可手动覆盖。不同服务商的专用参数不会互相发送。
+
+旧版 `BAILIAN_API_KEY`、`BAILIAN_CHAT_MODEL`、`BAILIAN_CHAT_BASE_URL` 继续兼容：未设置新服务商且仅使用旧密钥时，沿用原 Token Plan 地址和默认模型。显式选择新的服务商后不会复用旧百炼密钥。新部署建议使用上表中面向服务端的标准模型 API；百炼官方将 Token Plan / Coding Plan 的适用范围限定为 AI 工具交互，参见 [官方 Base URL 说明](https://help.aliyun.com/zh/model-studio/base-url)。
+
+接口参考：[百炼](https://help.aliyun.com/zh/model-studio/base-url) · [火山方舟](https://docs.volcengine.com/docs/ark/base-url-and-authentication?lang=zh) · [DeepSeek](https://api-docs.deepseek.com/) · [OpenAI](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create) · [Gemini](https://ai.google.dev/gemini-api/docs/openai)。
 
 聊天使用 SSE 流式输出，保留最近部分上下文，支持停止生成和代码复制。每个浏览器本地保存 50 轮使用计数；聊天框刷新按钮只清除对话，不重置计数。**这是浏览器端使用限制，不是每 IP 硬限额**，清除浏览器存储可绕过。如果用于公开大流量站点，请按实际需要增加服务端鉴权或限流。
 
-排查连接时访问 `/api/chat/status`：正常应返回 JSON，配置密钥后 `configured` 为 `true`；如果返回 HTML / 404，检查是否部署了平台函数。如果为 `false`，检查运行时环境变量并重新部署。不要将 Key 放到 `site.js`、frontmatter 或任何 `PUBLIC_` 变量中。
+排查连接时访问 `/api/chat/status`：正常应返回 JSON，密钥、模型和地址均已配置且格式有效时 `configured` 为 `true`；如果返回 HTML / 404，检查是否部署了平台函数。如果为 `false`，检查服务商、模型、地址和运行时密钥并重新部署。不要将 Key 放到 `site.js`、frontmatter 或任何 `PUBLIC_` 变量中。
 
 ## 项目结构
 

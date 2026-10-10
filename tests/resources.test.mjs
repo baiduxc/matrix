@@ -134,3 +134,34 @@ test("sound unlocks, produces non-silent bell/type/beam buffers, and releases so
 		globalThis.document = oldDocument;
 	}
 });
+
+test("disabled sound creates no AudioContext and stays silent for every effect", async () => {
+	const { siteMeta } = await import("../src/matrix/config/site.js");
+	const previous = siteMeta.soundEnabled;
+	const oldWindow = globalThis.window;
+	let contexts = 0;
+	globalThis.window = {
+		AudioContext: class {
+			constructor() {
+				contexts++;
+				throw new Error("Must not create audio resources");
+			}
+		},
+	};
+	siteMeta.soundEnabled = false;
+	try {
+		const engine = createSoundEngine();
+		for (const kind of ["click", "type", "beam"]) await engine.play(kind);
+		engine.setVisible(true);
+		assert.equal(contexts, 0);
+		assert.deepEqual(engine.getDiagnostics(), {
+			state: "disabled",
+			sources: 0,
+		});
+		engine.dispose();
+		assert.equal(engine.isDisposed(), true);
+	} finally {
+		siteMeta.soundEnabled = previous;
+		globalThis.window = oldWindow;
+	}
+});
